@@ -5,12 +5,7 @@
         <h5 class="card-header">Теги</h5>
         <div class="card-body">
             <div class="d-flex flex-wrap">
-                <a href="" class="m-2 h5 text-primary">#CSS</a>
-                <a href="" class="m-2 h5 text-primary">#JavaScript</a>
-                <a href="" class="m-2 h5 text-primary">#DRF</a>
-                <a href="" class="m-2 h5 text-primary">#NuxtJS</a>
-                <a href="" class="m-2 h5 text-primary">#Django</a>
-                <a href="" class="m-2 h5 text-primary">#VueJS</a>
+                <a href="{% url "tag" post.tag %}" class="m-2 h5 text-primary">#{{post.tag}}</a>
             </div>
         </div>
     </div>

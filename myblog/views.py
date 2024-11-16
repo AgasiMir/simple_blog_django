@@ -38,6 +38,24 @@ class PostDetailView(DetailView):
         return post
 
 
+class TagView(ListView):
+    template_name = "myblog/index.html"
+    context_object_name = "posts"
+    paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = Post.objects.filter(tag=self.kwargs['tag'])[0].tag
+        page = context["page_obj"]
+        context["paginator_range"] = page.paginator.get_elided_page_range(
+            page.number, on_each_side=1, on_ends=1
+        )
+        return context
+
+    def get_queryset(self):
+        return Post.objects.filter(tag=self.kwargs["tag"])
+
+
 class AboutView(TemplateView):
     template_name = "about.html"
     extra_context = {"title": "О нас"}
