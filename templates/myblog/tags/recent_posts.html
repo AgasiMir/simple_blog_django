@@ -1,0 +1,8 @@
+<div class="card-body">
+    {% for post in recent_posts %}
+    <h5 class="card-title">{{ post.title }}</h5>
+    <p class="card-text">{{ post.description|truncatewords:20 }}</p>
+    <a href="{{ post.get_absolute_url }}" class="card-link">Ссылка на статью</a>
+    <hr>
+    {% endfor %}
+</div>

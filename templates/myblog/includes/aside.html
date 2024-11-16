@@ -1,0 +1,21 @@
+{% load static %}
+{% load myblog_tags %}
+<div class="col-md-4">
+    <div class="card my-4">
+        <h5 class="card-header">Теги</h5>
+        <div class="card-body">
+            <div class="d-flex flex-wrap">
+                <a href="" class="m-2 h5 text-primary">#CSS</a>
+                <a href="" class="m-2 h5 text-primary">#JavaScript</a>
+                <a href="" class="m-2 h5 text-primary">#DRF</a>
+                <a href="" class="m-2 h5 text-primary">#NuxtJS</a>
+                <a href="" class="m-2 h5 text-primary">#Django</a>
+                <a href="" class="m-2 h5 text-primary">#VueJS</a>
+            </div>
+        </div>
+    </div>
+    <div class="card my-4">
+        <h5 class="card-header">Последние статьи</h5>
+        {% get_recent_posts %}
+    </div>
+</div>

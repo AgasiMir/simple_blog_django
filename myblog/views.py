@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView
+from django.views.generic import DetailView, TemplateView, ListView
 
 from myblog.models import Post
 
@@ -17,6 +17,25 @@ class HomeView(ListView):
             page.number, on_each_side=1, on_ends=1
         )
         return context
+
+
+class PostDetailView(DetailView):
+    template_name = "myblog/post_detail.html"
+    # Если бы из urls возвращался бы slug:slug, то такой подход бы сработал.
+    # Мы указалы бы, что в модели Post атрибут url соответствует слагу
+    # А так нужно написать метод get_object
+    # slug_field = 'url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = self.object.title
+        # context['title'] = context['post'].title
+        # context['title'] = Post.objects.get(url=self.kwargs['post_url']).title
+        return context
+
+    def get_object(self, queryset=None):
+        post = Post.objects.get(url=self.kwargs["post_url"])
+        return post
 
 
 class AboutView(TemplateView):

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 
 from myblog.services.utils import unique_slugify
 
@@ -19,7 +20,7 @@ class Post(models.Model):
     class Meta:
         verbose_name = "Пост"
         verbose_name_plural = "Посты"
-        ordering = ['-id']
+        ordering = ["-id"]
 
     def __str__(self) -> str:
         return self.title
@@ -28,3 +29,7 @@ class Post(models.Model):
         if not self.url:
             self.url = unique_slugify(self, self.title)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("detail", kwargs={"post_url": self.url})
+        # return reverse("detail", args=[self.url])
