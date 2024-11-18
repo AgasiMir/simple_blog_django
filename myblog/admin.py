@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Post
+from .models import Contact, Post
 
 
 @admin.register(Post)
@@ -38,6 +38,17 @@ class PostAdmin(admin.ModelAdmin):
         if obj.image:
             return mark_safe(f"<img src={obj.image.url} width=80%>")
         return "No image"
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ["name", "subject", "email", "created_at"]
+    list_display_links = ['name', 'subject']
+    date_hierarchy = "created_at"
+    list_filter = ["subject", "created_at"]
+    list_per_page = 20
+
+    readonly_fields = ["name", "email", "subject", "body", "created_at"]
 
 
 admin.site.site_title = "myblog"

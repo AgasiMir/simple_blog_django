@@ -33,3 +33,25 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse("detail", kwargs={"post_url": self.url})
         # return reverse("detail", args=[self.url])
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    OPTIONS = (
+        ("WISH", "Пожелания"),
+        ("TECH", "Техническая неисправность"),
+        ("OTHER", "Прочее"),
+    )
+    body = models.TextField()
+    subject = models.CharField(max_length=5, choices=OPTIONS, default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Обратная связь"
+        verbose_name_plural = "Обратная связь"
+        ordering = ['-id']
+
+
+    def __str__(self) -> str:
+        return f"{self.name}: {self.subject}"

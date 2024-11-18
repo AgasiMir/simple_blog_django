@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, TemplateView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from myblog.forms import SignUpForm
+from myblog.forms import ContactForm, SignUpForm
 
 from myblog.models import Post
 
@@ -80,11 +80,16 @@ class UserRegistrationView(CreateView):
     success_url = reverse_lazy("signin")
 
 
+class ContactView(CreateView):
+    template_name = "myblog/contact.html"
+    form_class = ContactForm
+    extra_context = {"title": "Обратная связь"}
+    success_url = reverse_lazy("home")
+
+
 class AboutView(TemplateView):
     template_name = "about.html"
     extra_context = {"title": "О нас"}
 
 
-class ContactView(TemplateView):
-    template_name = "contact.html"
-    extra_context = {"title": "Контакты"}
+
