@@ -18,9 +18,13 @@
                 <form class="d-flex" role="search">
                     <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">
                     <button class="btn btn-outline-success me-2" type="submit">Найти</button>
-                    <button type="button" class="btn btn-outline-light me-2">Вход</button>
-                    <button type="button" class="btn btn-outline-light me-2">Регистрация</button>
-                    <button type="button" class="btn btn-outline-light">Выход</button>
+                    {% if user.is_authenticated %}
+                        <small class="btn btn-outline-light me-2">{{user.username|truncatechars:20}}</small>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light me-2">Выход</a>
+                    {% else %}
+                        <a href="{% url 'signin' %}" class="btn btn-outline-light me-2">Войти</a>
+                        <a href="{% url 'signup' %}" class="btn btn-outline-light me-2">Регистрация</a>
+                    {% endif %}
                 </form>
           </div>
         </div>

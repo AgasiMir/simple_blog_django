@@ -1,4 +1,9 @@
-from django.views.generic import DetailView, TemplateView, ListView
+from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView, TemplateView, ListView
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from myblog.forms import SignUpForm
 
 from myblog.models import Post
 
@@ -45,7 +50,7 @@ class TagView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Post.objects.filter(tag=self.kwargs['tag'])[0].tag
+        context["title"] = Post.objects.filter(tag=self.kwargs["tag"])[0].tag
         page = context["page_obj"]
         context["paginator_range"] = page.paginator.get_elided_page_range(
             page.number, on_each_side=1, on_ends=1
@@ -54,6 +59,25 @@ class TagView(ListView):
 
     def get_queryset(self):
         return Post.objects.filter(tag=self.kwargs["tag"])
+
+
+class UserLoginView(LoginView):
+    model = get_user_model()
+    template_name = "myblog/signin.html"
+    form_class = AuthenticationForm
+    extra_context = {"title": "Авторизация"}
+    next_page = "home"
+
+
+class UserLogoutView(LogoutView):
+    next_page = "home"
+
+
+class UserRegistrationView(CreateView):
+    template_name = "myblog/signup.html"
+    form_class = SignUpForm
+    extra_context = {"title": "Регистрация"}
+    success_url = reverse_lazy("signin")
 
 
 class AboutView(TemplateView):
