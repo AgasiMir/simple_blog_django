@@ -27,6 +27,7 @@
         {% if comment.username == request.user %}
             <a href="{% url "comment_delete" comment.pk %}">Удалить</a>
         {% endif %} 
+        <br>
     </div>
 </div>
 {% endfor %}
