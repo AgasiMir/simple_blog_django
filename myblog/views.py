@@ -1,27 +1,34 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, TemplateView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from myblog.forms import ContactForm, SignUpForm
 
 from myblog.models import Post
 
 
-class HomeView(ListView):
-    model = Post
+class MixinView:
     template_name = "myblog/index.html"
     context_object_name = "posts"
-    extra_context = {"title": "Главная страница"}
     paginate_by = 6
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_mixin_context(self, context):
         page = context["page_obj"]
         context["paginator_range"] = page.paginator.get_elided_page_range(
             page.number, on_each_side=1, on_ends=1
         )
         return context
+
+
+class HomeView(MixinView, ListView):
+    model = Post
+    extra_context = {"title": "Главная страница"}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return self.get_mixin_context(context)
 
 
 class PostDetailView(DetailView):
@@ -43,19 +50,11 @@ class PostDetailView(DetailView):
         return post
 
 
-class TagView(ListView):
-    template_name = "myblog/index.html"
-    context_object_name = "posts"
-    paginate_by = 6
-
+class TagView(MixinView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = Post.objects.filter(tag=self.kwargs["tag"])[0].tag
-        page = context["page_obj"]
-        context["paginator_range"] = page.paginator.get_elided_page_range(
-            page.number, on_each_side=1, on_ends=1
-        )
-        return context
+        return self.get_mixin_context(context)
 
     def get_queryset(self):
         return Post.objects.filter(tag=self.kwargs["tag"])
@@ -87,9 +86,24 @@ class ContactView(CreateView):
     success_url = reverse_lazy("home")
 
 
+class Search(MixinView, ListView):
+
+    search_obj = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = str(self.__class__.search_obj).capitalize()
+        return self.get_mixin_context(context)
+
+    def get_queryset(self):
+        if "q" in self.request.GET:
+            self.__class__.search_obj = self.request.GET.get("q")
+        return Post.objects.filter(
+            Q(title__iregex=self.__class__.search_obj)
+            | Q(tag__iregex=self.__class__.search_obj)
+        )
+
+
 class AboutView(TemplateView):
     template_name = "about.html"
     extra_context = {"title": "О нас"}
-
-
-
