@@ -50,8 +50,24 @@ class Contact(models.Model):
     class Meta:
         verbose_name = "Обратная связь"
         verbose_name_plural = "Обратная связь"
-        ordering = ['-id']
-
+        ordering = ["-id"]
 
     def __str__(self) -> str:
         return f"{self.name}: {self.subject}"
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    username = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="user_name"
+    )
+    text = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
+        ordering = ["-id"]
+
+    def __str__(self):
+        return f"{self.username}: {self.text}"

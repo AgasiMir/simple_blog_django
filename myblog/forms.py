@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
-from myblog.models import Contact
+from myblog.models import Contact, Comment
 
 
 class SignUpForm(UserCreationForm):
@@ -85,3 +85,12 @@ class ContactForm(forms.ModelForm):
         fields = ["subject", "name", "email", "body"]
 
         widgets = {"body": forms.Textarea(attrs={"cols": 60, "rows": 10})}
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("text",)
+        widgets = {
+            "text": forms.Textarea(attrs={"class": "form-control mb-3", "rows": 3}),
+        }

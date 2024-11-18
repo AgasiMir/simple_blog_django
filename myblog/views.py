@@ -1,12 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, TemplateView, ListView
+from django.views import View
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    TemplateView,
+    ListView,
+)
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import AuthenticationForm
-from myblog.forms import ContactForm, SignUpForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from myblog.forms import CommentForm, ContactForm, SignUpForm
 
-from myblog.models import Post
+from myblog.models import Post, Comment
 
 
 class MixinView:
@@ -41,6 +50,8 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = self.object.title
+        context["comment_form"] = CommentForm
+        context["comments"] = Comment.objects.filter(post=self.object)
         # context['title'] = context['post'].title
         # context['title'] = Post.objects.get(url=self.kwargs['post_url']).title
         return context
@@ -102,6 +113,37 @@ class Search(MixinView, ListView):
             Q(title__iregex=self.__class__.search_obj)
             | Q(tag__iregex=self.__class__.search_obj)
         )
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.post_id = self.kwargs.get("pk")
+        comment.username = self.request.user
+        comment.save()
+        # return redirect(self.request.META.get("HTTP_REFERER"))
+        return redirect(comment.post.get_absolute_url())
+
+
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Comment
+
+    def get_object(self, queryset=None):
+        Comment.objects.get(pk=self.kwargs["pk"]).delete()
+
+
+class CommentCreateView_2(View):
+    def post(self, request, pk):
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.post_id = pk
+            form.username = self.request.user
+            form.save()
+        return redirect(self.request.META.get("HTTP_REFERER"))
+        # return redirect(form.post.get_absolute_url())
 
 
 class AboutView(TemplateView):

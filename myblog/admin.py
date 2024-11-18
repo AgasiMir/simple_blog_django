@@ -1,17 +1,24 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Contact, Post
+from .models import Contact, Post, Comment
 
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     search_fields = ["title", "author__username", "tag"]
-    list_display = ["get_image", "title", "tag", "author", "created_at"]
+    list_display = [
+        "get_image",
+        "title",
+        "tag",
+        "author",
+        "get_comments_count",
+        "created_at",
+    ]
     list_display_links = ["get_image", "title"]
     ordering = ["-id", "title", "author"]
     date_hierarchy = "created_at"
-    list_filter = ["created_at", "author__username"]
+    list_filter = ["created_at"]
     list_per_page = 10
 
     fields = [
@@ -39,16 +46,33 @@ class PostAdmin(admin.ModelAdmin):
             return mark_safe(f"<img src={obj.image.url} width=80%>")
         return "No image"
 
+    @admin.display(description="comments")
+    def get_comments_count(self, obj: Post):
+        return obj.comments.count()
+
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
     list_display = ["name", "subject", "email", "created_at"]
-    list_display_links = ['name', 'subject']
+    list_display_links = ["name", "subject"]
     date_hierarchy = "created_at"
     list_filter = ["subject", "created_at"]
     list_per_page = 20
 
     readonly_fields = ["name", "email", "subject", "body", "created_at"]
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ["username", "get_text", "created_date"]
+    list_display_links = ["username", "get_text"]
+    date_hierarchy = "created_date"
+    list_filter = ["created_date"]
+    list_per_page = 20
+
+    @admin.display(description="text")
+    def get_text(self, obj: Comment):
+        return obj.text[:75] if len(obj.text) <= 125 else obj.text[:72] + "..."
 
 
 admin.site.site_title = "myblog"
