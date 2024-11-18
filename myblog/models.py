@@ -5,6 +5,18 @@ from django.urls import reverse
 from myblog.services.utils import unique_slugify
 
 
+class CommentManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("username", "post")
+
+
+class PostManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super().get_queryset().select_related("author").prefetch_related("comments")
+        )
+
+
 class Post(models.Model):
     h1 = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
@@ -16,6 +28,12 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+    # Такой подход полностью удовлетворяет админку,
+    # но добавляет еще один в index.html и post_detail.html.
+    #  Поэтому, в моделях использовал мэнеджер только к комментариям,
+    #  а в админке уже чере qet_queryset, оптимизировал посты
+    # objects = PostManager()
 
     class Meta:
         verbose_name = "Пост"
@@ -64,10 +82,12 @@ class Comment(models.Model):
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
 
+    objects = CommentManager()
+
     class Meta:
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
         ordering = ["-id"]
 
     def __str__(self):
-        return f"{self.username}: {self.text}"
+        return f"{self.username}: {self.post}"
