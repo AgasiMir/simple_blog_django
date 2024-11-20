@@ -21,7 +21,16 @@ from myblog.models import Post, Comment
 class MixinView:
     template_name = "myblog/index.html"
     context_object_name = "posts"
-    paginate_by = 6
+    posts_per_page = 6
+
+    def get_paginate_by(self, request):
+        if "9" in self.request.GET:
+            self.__class__.posts_per_page = 9
+
+        if "6" in self.request.GET:
+            self.__class__.posts_per_page = 6
+
+        return self.__class__.posts_per_page
 
     def get_mixin_context(self, context):
         page = context["page_obj"]

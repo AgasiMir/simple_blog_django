@@ -7,7 +7,15 @@
 
 {% block content %}
     <div class="container">
-      <h1 class="my-3">Последние записи блога</h1>
+      <form mehtod="get">
+        {% comment %} <p>Количество постов на странице</p> {% endcomment %}
+        <br>
+        <hr>
+        <button name='6'class="btn btn-sm btn-outline-secondary">6</button>
+        <button name='9'class="btn btn-sm btn-outline-secondary">9</button>
+      </form>
+      <br>
+      {% comment %} <h1 class="my-3">Последние записи блога</h1> {% endcomment %}
       <div class="row">
         {% for post in posts %}
         <div class="col-md-4">
