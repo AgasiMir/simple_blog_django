@@ -15,6 +15,12 @@
         {% endif %}
     </div>
 </div>
+<form metond="get">
+    <button name='new' class="btn btn-sm btn-outline-secondary">Сначала новые</button>
+    <button name='old' class="btn btn-sm btn-outline-secondary">Сначала старые</button>
+</form>
+<br>
+<hr>
 {% for comment in comments %}
 <div class="d-flex">
     <div class="flex-shrink-0">
@@ -22,6 +28,7 @@
     </div>
     <div class="flex-grow-1 ms-3">
         <h5 class="mt-0">{{comment.username}}</h5>
+        <p>{{ comment.created_date }}</p>
         {{comment.text}}
         <br>
         {% if comment.username == request.user %}

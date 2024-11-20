@@ -27,7 +27,7 @@ class MixinView:
         if "9" in self.request.GET:
             self.__class__.posts_per_page = 9
 
-        if "6" in self.request.GET:
+        elif "6" in self.request.GET:
             self.__class__.posts_per_page = 6
 
         return self.__class__.posts_per_page
@@ -60,7 +60,18 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["title"] = self.object.title
         context["comment_form"] = CommentForm
-        context["comments"] = Comment.objects.filter(post=self.object)
+
+        context["comments"] = Comment.objects.filter(post=self.object).order_by("-id")
+
+        if "new" in self.request.GET:
+            context["comments"] = Comment.objects.filter(post=self.object).order_by(
+                "-id"
+            )
+        elif "old" in self.request.GET:
+            context["comments"] = Comment.objects.filter(post=self.object).order_by(
+                "id"
+            )
+
         # context['title'] = context['post'].title
         # context['title'] = Post.objects.get(url=self.kwargs['post_url']).title
         return context
